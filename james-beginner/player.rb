@@ -1,7 +1,11 @@
 require 'ruby-debug'
 
-class RubyWarrior::Turn
-
+class Player
+  def play_turn(warrior) 
+    @health ||= warrior.health
+    warrior.determine_move(@health)
+    @health = warrior.health
+  end
   def should_back_up?
     if health <= 10
       if feel.enemy? and feel.character != "a"
@@ -45,14 +49,6 @@ class RubyWarrior::Turn
       return
     end
     previous_health = health
-  end
-end
-
-class Player
-  def play_turn(warrior) 
-    @health ||= warrior.health
-    warrior.determine_move(@health)
-    @health = warrior.health
   end
 end
 
