@@ -11,10 +11,10 @@ class Player
 protected
 
   def determine_and_take_move
-    @warrior.walk!(:backward) and return if should_back_up?
+    @warrior.walk!(:backward) and return if should_walk_backward?
     @warrior.rest! and return if should_rest?
     @warrior.attack! and return if should_attack?
-    @warrior.rescue! and return if should_free_captive?
+    @warrior.rescue!(should_free_captive?) and return if should_free_captive?
     @warrior.walk! and return if should_walk_forward?
     @health = @warrior.health
   end
@@ -23,11 +23,14 @@ protected
     true if @warrior.feel.empty?
   end
 
-  def should_back_up?
+  def should_walk_backward?
+    @hit_back_wall = true if @warrior.feel(:backward).wall?
     if @warrior.health <= 10
       if @warrior.feel.enemy? and @warrior.feel.character != "a"
         true 
       end
+    elsif @warrior.feel(:backward).empty? and !@hit_back_wall
+      true
     end
   end
 
@@ -44,7 +47,11 @@ protected
   end
 
   def should_free_captive?
-    true if @warrior.feel.captive?
+    if @warrior.feel.captive? 
+      :forward 
+    elsif @warrior.feel(:backward).captive?
+      :backward
+    end
   end
 
 
